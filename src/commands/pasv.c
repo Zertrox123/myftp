@@ -21,6 +21,7 @@ int pasv_cmd(client_t *client)
 
     if (client->pasv_fd != -1)
         close(client->pasv_fd);
+    client->port_mode = 0;
     client->pasv_fd = socket(AF_INET, SOCK_STREAM, 0);
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = htonl(INADDR_ANY);

@@ -52,5 +52,7 @@ void init_poll_clients(struct pollfd *nb, client_t *client, int size)
         client[i].home = NULL;
         client[i].cwd = NULL;
         client[i].pasv_fd = -1;
+        client[i].port_mode = 0;
+        client[i].buf_len = 0;
     }
 }

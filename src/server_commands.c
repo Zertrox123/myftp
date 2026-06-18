@@ -13,6 +13,24 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
+int exec_ftp_cmd3(client_t *client, char **cmd)
+{
+    if (strcmp(cmd[0], "LIST") == 0)
+        return list_cmd(client);
+    if (strcmp(cmd[0], "RETR") == 0)
+        return retrieve_cmd(client, cmd);
+    if (strcmp(cmd[0], "STOR") == 0)
+        return stor_cmd(client, cmd);
+    if (strcmp(cmd[0], "DELE") == 0)
+        return delete_cmd(client, cmd);
+    if (strcmp(cmd[0], "HELP") == 0) {
+        write(client->fd, "214 Help message.\r\n", 19);
+        return 0;
+    }
+    write(client->fd, "500 Unknown command.\r\n", 22);
+    return 0;
+}
+
 int exec_ftp_cmd2(client_t *client, char **cmd)
 {
     if (strcmp(cmd[0], "TYPE") == 0)
@@ -23,22 +41,23 @@ int exec_ftp_cmd2(client_t *client, char **cmd)
         return cwd_cmd(client, cmd);
     if (strcmp(cmd[0], "PASV") == 0)
         return pasv_cmd(client);
+    if (strcmp(cmd[0], "PORT") == 0)
+        return port_cmd(client, cmd);
     if (strcmp(cmd[0], "CDUP") == 0)
         return cdup_cmd(client);
     if (strcmp(cmd[0], "NOOP") == 0) {
         write(client->fd, "200 NOOP ok.\r\n", 14);
         return 0;
     }
-    if (strcmp(cmd[0], "LIST") == 0)
-        return list_cmd(client);
-    write(client->fd, "500 Unknown command.\r\n", 22);
-    return 0;
+    return exec_ftp_cmd3(client, cmd);
 }
 
 int exec_ftp_cmd(client_t *client, char **cmd)
 {
-    if (cmd[0] == NULL)
+    if (cmd[0] == NULL) {
+        write(client->fd, "500 Unknown command.\r\n", 22);
         return 0;
+    }
     if (strcmp(cmd[0], "USER") == 0)
         return user_cmd(client, cmd);
     if (strcmp(cmd[0], "PASS") == 0)

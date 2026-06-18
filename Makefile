@@ -9,7 +9,12 @@ SRC     =	src/main.c	\
 			src/commands/pasv.c	\
 			src/commands/pwd.c	\
 			src/commands/type.c	\
-			src/commands/list.c
+			src/commands/list.c	\
+			src/commands/data.c	\
+			src/commands/port.c	\
+			src/commands/retr.c	\
+			src/commands/stor.c	\
+			src/commands/delete.c
 
 OBJ     = $(SRC:.c=.o)
 

@@ -9,6 +9,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <strings.h>
 
 int user_cmd(client_t *client, char **cmd)
 {
@@ -25,7 +26,6 @@ int user_cmd(client_t *client, char **cmd)
 int pass_cmd(client_t *client, char **cmd)
 {
     (void)cmd;
-
     if (client->logged == 1) {
         write(client->fd, "230 Already logged in.\r\n", 24);
         return 0;

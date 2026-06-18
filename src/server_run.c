@@ -29,15 +29,40 @@ static int new_client(int s_fd, int total_client, srv_ctx_t *ctx)
     ctx->clients[total_client].user = NULL;
     ctx->clients[total_client].home = strdup(ctx->home);
     ctx->clients[total_client].cwd = strdup("/");
+    ctx->clients[total_client].pasv_fd = -1;
+    ctx->clients[total_client].port_mode = 0;
+    ctx->clients[total_client].buf_len = 0;
     write(fd, "220 Welcome here !\r\n", 20);
     return total_client + 1;
+}
+
+static void process_lines(client_t *client)
+{
+    int i = 0;
+    char line[4096];
+
+    while (i < client->buf_len) {
+        if (i < client->buf_len - 1 && client->buf[i] == '\r' &&
+            client->buf[i + 1] == '\n') {
+            memcpy(line, client->buf, i);
+            line[i] = '\0';
+            memmove(client->buf, client->buf + i + 2,
+                client->buf_len - i - 2);
+            client->buf_len -= i + 2;
+            i = 0;
+            handle_client(client, line);
+            continue;
+        }
+        i++;
+    }
 }
 
 static void read_one_client(struct pollfd *nb, client_t *client, int i)
 {
     char buffer[1024] = {0};
+    int n = read(nb[i].fd, buffer, 1023);
 
-    if (read(nb[i].fd, buffer, 1024) <= 0) {
+    if (n <= 0) {
         close(nb[i].fd);
         nb[i].fd = -1;
         if (client[i].user != NULL) {
@@ -53,7 +78,10 @@ static void read_one_client(struct pollfd *nb, client_t *client, int i)
             client[i].cwd = NULL;
         }
     } else {
-        handle_client(&client[i], buffer);
+        memcpy(client[i].buf + client[i].buf_len, buffer, n);
+        client[i].buf_len += n;
+        client[i].buf[client[i].buf_len] = '\0';
+        process_lines(&client[i]);
         nb[i].fd = client[i].fd;
     }
 }
