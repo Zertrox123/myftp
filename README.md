@@ -1,17 +1,27 @@
 # MyFTP
 
-Asynchronous FTP server compliant with RFC 959 written in C.
+Serveur de transfert de fichiers asynchrone conforme à la RFC 959 en C.
 
-## Overview
+## Présentation
 
-Supports dual TCP connections (control on port 21 and dynamic data connection in PASV/PORT modes), user authentication, and standard RFC commands.
+MyFTP (G-NWP-400) est une implémentation complète d'un serveur FTP supportant les connexions simultanées de multiples clients.
 
-## Getting Started
+Caractéristiques techniques :
+- Gestion de la connexion de contrôle (port 21) et des canaux de données dynamiques (modes `PASV` et `PORT`).
+- Support des commandes standard : `USER`, `PASS`, `CWD`, `CDUP`, `QUIT`, `DELE`, `PWD`, `PASV`, `PORT`, `HELP`, `NOOP`, `RETR`, `STOR`, `LIST`.
+- Isolation des répertoires et authentification anonyme ou utilisateur.
+
+## Prérequis
+
+- GCC
+- Make
+
+## Compilation et Lancement
 
 ```bash
-# Compile
+# Compiler le serveur
 make
 
-# Run server: ./myftp <port> <path>
+# Lancer le serveur : ./myftp <port> <chemin_racine>
 ./myftp 4242 ./
 ```
